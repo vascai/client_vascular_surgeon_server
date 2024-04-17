@@ -5,6 +5,7 @@ from pinecone import Pinecone
 from utils import *
 from openai import OpenAI
 import os
+from dotenv import load_dotenv
 
 app = FastAPI()
 
@@ -14,9 +15,6 @@ def hello():
   return "Hi"
 
 
-#@app.get("/query_ai/")
-#def query_ai(query: str, namespace: str):
-  
 @app.post("/query_ai/")
 async def query_ai(request: Request):
   # Manually extract JSON from the request body
@@ -29,15 +27,13 @@ async def query_ai(request: Request):
   formatted_previous_messages = format_previous_messages(previous_messages)
  
   client = OpenAI(api_key=os.environ["OPENAI_KEY"])
-
   pc = Pinecone(api_key=os.environ["PINECONE_KEY"])
+
   index_name = 'surgeon-vectordb'
   pinecone_index = pc.Index(index_name)
 
   query_embedding = get_embedding(client, query, model="text-embedding-3-large")
-
   retrieved_context = pinecone_index.query(vector=[query_embedding], top_k=25, include_metadata=True, namespace=namespace)
-
   context = reformat_retrieved_context(retrieved_context)
 
   chat_completion = client.chat.completions.create(
@@ -52,11 +48,12 @@ async def query_ai(request: Request):
   answer_with_sources = add_source_url(answer, context)
   print("complete")
   
-
-  
   return {"answer" : answer_with_sources, "sources" : context}
 
-uvicorn.run(app,host="0.0.0.0",port="8080")
+
+if __name__ == "__main__":
+  load_dotenv()
+  uvicorn.run(app,host="0.0.0.0",port=8080)
 
 
 
