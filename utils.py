@@ -52,12 +52,21 @@ QUESTION:
 
 def add_source_url(answer, context):
 
+    source_added = False 
+
     for i in range(0, len(context)):
         source_placeholder_v1 = f"[Source {i + 1}]"
         source_placeholder_v2 = f"(Source {i + 1})"
         url = context[i]['original_link']
-        html_link = f'<sup><a href="{url}" style="text-decoration: none;">{i + 1}</a></sup>'
+        html_link = ""
+        if source_added:
+            html_link = f'<sup><a href="{url}" style="text-decoration: none;">, {i + 1}</a></sup>'
+        else:
+            html_link = f'<sup><a href="{url}" style="text-decoration: none;">{i + 1}</a></sup>'
 
+
+        if source_placeholder_v1 in answer or source_placeholder_v2 in answer:
+            source_added = True
         answer = answer.replace(source_placeholder_v1, html_link)
         answer = answer.replace(source_placeholder_v2, html_link)
 
