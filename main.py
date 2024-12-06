@@ -37,7 +37,7 @@ async def query_ai(request: Request):
   context = reformat_retrieved_context(retrieved_context)
 
   chat_completion = client.chat.completions.create(
-      model="gpt-4-1106-preview",
+      model="chatgpt-4o-latest",
       messages=[
           {"role": "system", "content": get_system_prompt()},
           {"role": "user", "content": get_user_prompt(query, context, formatted_previous_messages)}
